@@ -64,14 +64,16 @@ impl Tui<'_> {
 
             write!(
                 self.stdout,
-                "{}{}{}{}{}\n{}{}",
-                termion::clear::CurrentLine,
+                "{}{}{}{}{}\n{}{}{}{}",
                 termion::cursor::Goto(size.0 / 2 - (state_string.len() / 2) as u16, size.1 / 2 - 1),
+                termion::clear::CurrentLine,
                 termion::style::Bold,
                 state_string,
                 termion::style::Reset,
                 termion::cursor::Goto(size.0 / 2 - (time_string.len() / 2) as u16, size.1 / 2),
+                termion::clear::CurrentLine,
                 time_string,
+                termion::cursor::Hide,
             )
             .unwrap();
             self.stdout.flush().unwrap();
