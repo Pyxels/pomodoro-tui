@@ -4,8 +4,8 @@ const WORK_TIME: i64 = 25 * 60;
 const SMALL_REST_TIME: i64 = 5 * 60;
 const LARGE_REST_TIME: i64 = 35 * 60;
 
-#[derive(Debug)]
-enum State {
+#[derive(Debug, Clone)]
+pub enum State {
     Work(u8),
     SmallBreak(u8),
     LargeBreak,
@@ -69,7 +69,7 @@ impl Pomodoro {
         }
     }
 
-    pub fn state(&self) -> String {
+    pub fn print_state(&self) -> String {
         let mut output = String::new();
         let mut state = &self.state;
         if let State::Overtime(x) = &self.state {
@@ -86,5 +86,9 @@ impl Pomodoro {
                 _ => unreachable!(),
             }
         )
+    }
+
+    pub fn state(&self) -> State {
+        self.state.clone()
     }
 }

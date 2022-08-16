@@ -6,7 +6,7 @@ use termion::event::{parse_event, Event, Key};
 use termion::raw::{IntoRawMode, RawTerminal};
 use termion::{async_stdin, terminal_size, AsyncReader};
 
-use crate::pomodoro::Pomodoro;
+use crate::pomodoro::{Pomodoro, State};
 
 pub struct Tui<'a> {
     stdout: RawTerminal<StdoutLock<'a>>,
@@ -61,11 +61,15 @@ impl Tui<'_> {
 
             let state_string = self.get_state_string(size);
             let time_string = self.get_time_string(size);
+            let color_string = self.get_color_string();
 
             write!(
                 self.stdout,
-                "{}{}{}",
+                "{}{}{}{}{}{}",
+                termion::clear::All,
+                color_string,
                 state_string,
+                color_string,
                 time_string,
                 termion::cursor::Hide,
             )
@@ -76,11 +80,10 @@ impl Tui<'_> {
     }
 
     fn get_state_string(&self, size: (u16, u16)) -> String {
-        let state_string = self.pomodoro.state();
+        let state_string = self.pomodoro.print_state();
         format!(
-            "{}{}{}{}{}",
+            "{}{}{}{}",
             termion::cursor::Goto(size.0 / 2 - (state_string.len() / 2) as u16, size.1 / 2 - 1),
-            termion::clear::CurrentLine,
             termion::style::Bold,
             state_string,
             termion::style::Reset,
@@ -94,15 +97,28 @@ impl Tui<'_> {
             x => format!("Time left: {}m", x / 60),
         };
         format!(
-            "\n{}{}{}",
+            "\n{}{}",
             termion::cursor::Goto(size.0 / 2 - (time_string.len() / 2) as u16, size.1 / 2),
-            termion::clear::CurrentLine,
             time_string,
         )
     }
 
+    fn get_color_string(&self) -> String {
+        match self.pomodoro.state() {
+            State::Overtime(_) => termion::color::Bg(termion::color::Red).to_string(),
+            _ => termion::color::Bg(termion::color::Reset).to_string(),
+        }
+    }
+
     fn cleanup(&mut self) {
-        write!(self.stdout, "{}", termion::cursor::Show).unwrap();
+        write!(
+            self.stdout,
+            "{}{}{}",
+            termion::color::Bg(termion::color::Reset),
+            termion::clear::All,
+            termion::cursor::Show
+        )
+        .unwrap();
         self.stdout.flush().unwrap();
     }
 }
