@@ -1,8 +1,10 @@
 [package]
 name = "pomodoro-tui"
+description = "Basic TUI application for work management using the pomodoro technique."
 version = "0.1.0"
 edition = "2021"
 
 
 [dependencies]
+clap = { version = "3.2.17", features = ["derive"] }
 termion = "1.5.6"

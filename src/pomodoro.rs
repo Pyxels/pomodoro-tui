@@ -1,9 +1,5 @@
 use std::time::SystemTime;
 
-const WORK_TIME: i64 = 25 * 60;
-const SMALL_REST_TIME: i64 = 5 * 60;
-const LARGE_REST_TIME: i64 = 35 * 60;
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum State {
     Work(u8),
@@ -14,13 +10,19 @@ pub enum State {
 
 #[derive(Debug)]
 pub struct Pomodoro {
+    work_time: i64,
+    small_rest_time: i64,
+    large_rest_time: i64,
     state: State,
     start_time: SystemTime,
 }
 
 impl Pomodoro {
-    pub fn new() -> Pomodoro {
+    pub fn new(work_minutes: i64, small_rest_minutes: i64, large_rest_minutes: i64) -> Pomodoro {
         Pomodoro {
+            work_time: work_minutes * 60,
+            small_rest_time: small_rest_minutes * 60,
+            large_rest_time: large_rest_minutes * 60,
             state: State::Work(1),
             start_time: SystemTime::now(),
         }
@@ -29,22 +31,22 @@ impl Pomodoro {
     pub fn tick(&mut self) {
         match self.state {
             State::Work(4) => {
-                if self.seconds_passed() > WORK_TIME {
+                if self.seconds_passed() > self.work_time {
                     self.state = State::Overtime(Box::new(State::Work(4)));
                 }
             }
             State::Work(x) => {
-                if self.seconds_passed() > WORK_TIME {
+                if self.seconds_passed() > self.work_time {
                     self.state = State::Overtime(Box::new(State::Work(x)));
                 }
             }
             State::SmallBreak(x) => {
-                if self.seconds_passed() > SMALL_REST_TIME {
+                if self.seconds_passed() > self.small_rest_time {
                     self.state = State::Overtime(Box::new(State::SmallBreak(x)));
                 }
             }
             State::LargeBreak => {
-                if self.seconds_passed() > LARGE_REST_TIME {
+                if self.seconds_passed() > self.large_rest_time {
                     self.state = State::Overtime(Box::new(State::LargeBreak));
                 }
             }
@@ -62,7 +64,7 @@ impl Pomodoro {
                     self.state = State::SmallBreak(x);
                 }
                 State::SmallBreak(x) => {
-                    self.state = State::Work(x+1);
+                    self.state = State::Work(x + 1);
                 }
                 State::LargeBreak => {
                     self.state = State::Work(1);
@@ -85,9 +87,9 @@ impl Pomodoro {
             state = x;
         }
         match state {
-            State::Work(_) => WORK_TIME - self.seconds_passed(),
-            State::SmallBreak(_) => SMALL_REST_TIME - self.seconds_passed(),
-            State::LargeBreak => LARGE_REST_TIME - self.seconds_passed(),
+            State::Work(_) => self.work_time - self.seconds_passed(),
+            State::SmallBreak(_) => self.small_rest_time - self.seconds_passed(),
+            State::LargeBreak => self.large_rest_time - self.seconds_passed(),
             State::Overtime(_) => unreachable!(),
         }
     }
