@@ -15,12 +15,22 @@ pub struct Tui<'a> {
 }
 
 impl Tui<'_> {
-    pub fn new(work_time: i64, small_rest_time: i64, large_rest_time: i64) -> Tui<'static> {
+    pub fn new(
+        work_time: i64,
+        small_rest_time: i64,
+        large_rest_time: i64,
+        send_notifications: bool,
+    ) -> Tui<'static> {
         let stdout = stdout();
         let stdout = stdout.lock().into_raw_mode().unwrap();
         let stdin = async_stdin().bytes();
 
-        let pomodoro = Pomodoro::new(work_time, small_rest_time, large_rest_time);
+        let pomodoro = Pomodoro::new(
+            work_time,
+            small_rest_time,
+            large_rest_time,
+            send_notifications,
+        );
         Tui {
             stdout,
             stdin,

@@ -11,12 +11,13 @@ use crate::tui::Tui;
 
 fn main() {
     let Args {
-        work: work_time,
-        small_rest: small_rest_time,
-        large_rest: large_rest_time,
+        work,
+        small_rest,
+        large_rest,
+        notifications,
     } = Args::parse();
 
-    Tui::new(work_time, small_rest_time, large_rest_time)
+    Tui::new(work, small_rest, large_rest, notifications)
         .clear()
         .start_loop();
 }

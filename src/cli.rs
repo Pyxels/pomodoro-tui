@@ -14,4 +14,8 @@ pub struct Args {
     /// Duration of the long rest segment (minutes)
     #[clap(short, long, default_value_t = 35)]
     pub large_rest: i64,
+
+    /// Enable desktop notifications via the notification daemon
+    #[clap(short, long)]
+    pub notifications: bool,
 }
