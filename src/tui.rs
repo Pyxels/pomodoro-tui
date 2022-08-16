@@ -47,12 +47,16 @@ impl Tui<'_> {
                     self.cleanup();
                     break;
                 }
-                Some(Ok(x)) => {
-                    if let Ok(Event::Key(Key::Ctrl('c'))) = parse_event(x, &mut self.stdin) {
+                Some(Ok(x)) => match parse_event(x, &mut self.stdin) {
+                    Ok(Event::Key(Key::Ctrl('c'))) => {
                         self.cleanup();
                         break;
                     }
-                }
+                    Ok(Event::Key(Key::Char('n'))) => {
+                        self.pomodoro.next();
+                    }
+                    _ => (),
+                },
                 _ => (),
             }
 
@@ -65,8 +69,7 @@ impl Tui<'_> {
 
             write!(
                 self.stdout,
-                "{}{}{}{}{}{}",
-                termion::clear::All,
+                "{}{}{}{}{}",
                 color_string,
                 state_string,
                 color_string,
@@ -82,7 +85,8 @@ impl Tui<'_> {
     fn get_state_string(&self, size: (u16, u16)) -> String {
         let state_string = self.pomodoro.print_state();
         format!(
-            "{}{}{}{}",
+            "{}{}{}{}{}",
+            termion::clear::All,
             termion::cursor::Goto(size.0 / 2 - (state_string.len() / 2) as u16, size.1 / 2 - 1),
             termion::style::Bold,
             state_string,
