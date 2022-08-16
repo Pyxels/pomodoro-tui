@@ -66,14 +66,16 @@ impl Tui<'_> {
             let state_string = self.get_state_string(size);
             let time_string = self.get_time_string(size);
             let color_string = self.get_color_string();
+            let footer_string = Self::get_footer(size);
 
             write!(
                 self.stdout,
-                "{}{}{}{}{}",
+                "{}{}{}{}{}{}",
                 color_string,
                 state_string,
                 color_string,
                 time_string,
+                footer_string,
                 termion::cursor::Hide,
             )
             .unwrap();
@@ -112,6 +114,17 @@ impl Tui<'_> {
             State::Overtime(_) => termion::color::Bg(termion::color::Red).to_string(),
             _ => termion::color::Bg(termion::color::Reset).to_string(),
         }
+    }
+
+    fn get_footer(size: (u16, u16)) -> String {
+        let footer = String::from("press 'n' to continue - press 'q' to quit");
+        format!(
+            "{}{}{}{}",
+            termion::cursor::Goto(size.0 / 2 - (footer.len() / 2) as u16, size.1),
+            termion::style::Italic,
+            footer,
+            termion::style::Reset,
+        )
     }
 
     fn cleanup(&mut self) {
