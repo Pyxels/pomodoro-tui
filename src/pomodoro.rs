@@ -1,14 +1,15 @@
 use std::time::SystemTime;
 
-const WORK_TIME: u64 = 25 * 60;
-const SMALL_REST_TIME: u64 = 5 * 60;
-const LARGE_REST_TIME: u64 = 35 * 60;
+const WORK_TIME: i64 = 25 * 60;
+const SMALL_REST_TIME: i64 = 5 * 60;
+const LARGE_REST_TIME: i64 = 35 * 60;
 
 #[derive(Debug)]
 enum State {
     Work(u8),
     SmallBreak(u8),
     LargeBreak,
+    Overtime(Box<State>),
 }
 
 #[derive(Debug)]
@@ -28,53 +29,62 @@ impl Pomodoro {
     pub fn tick(&mut self) {
         match self.state {
             State::Work(4) => {
-                // 25 * 60
                 if self.seconds_passed() > WORK_TIME {
-                    self.state = State::LargeBreak;
-                    self.start_time = SystemTime::now();
+                    self.state = State::Overtime(Box::new(State::Work(4)));
                 }
             }
             State::Work(x) => {
-                // 25 * 60
                 if self.seconds_passed() > WORK_TIME {
-                    self.state = State::SmallBreak(x);
-                    self.start_time = SystemTime::now();
+                    self.state = State::Overtime(Box::new(State::Work(x)));
                 }
             }
             State::SmallBreak(x) => {
-                // 5 * 60
                 if self.seconds_passed() > SMALL_REST_TIME {
-                    self.state = State::Work(x + 1);
-                    self.start_time = SystemTime::now();
+                    self.state = State::Overtime(Box::new(State::SmallBreak(x)));
                 }
             }
             State::LargeBreak => {
-                // 35 * 60
                 if self.seconds_passed() > LARGE_REST_TIME {
-                    self.state = State::Work(1);
-                    self.start_time = SystemTime::now();
+                    self.state = State::Overtime(Box::new(State::LargeBreak));
                 }
             }
+            _ => (),
         }
     }
 
-    fn seconds_passed(&self) -> u64 {
-        self.start_time.elapsed().unwrap().as_secs()
+    fn seconds_passed(&self) -> i64 {
+        self.start_time.elapsed().unwrap().as_secs() as i64
     }
 
-    pub fn seconds_remaining(&self) -> u64 {
-        match self.state {
+    pub fn seconds_remaining(&self) -> i64 {
+        let mut state = &self.state;
+        if let State::Overtime(x) = state {
+            state = x;
+        }
+        match state {
             State::Work(_) => WORK_TIME - self.seconds_passed(),
             State::SmallBreak(_) => SMALL_REST_TIME - self.seconds_passed(),
             State::LargeBreak => LARGE_REST_TIME - self.seconds_passed(),
+            State::Overtime(_) => unreachable!(),
         }
     }
 
     pub fn state(&self) -> String {
-        match self.state {
-            State::Work(x) => format!("Work Nr. {}", x),
-            State::SmallBreak(x) => format!("Small Break Nr. {}", x),
-            State::LargeBreak => "Large Break".to_string(),
+        let mut output = String::new();
+        let mut state = &self.state;
+        if let State::Overtime(x) = &self.state {
+            output = String::from("Overtime: ");
+            state = x;
         }
+        format!(
+            "{}{}",
+            output,
+            match state {
+                State::Work(x) => format!("Work Nr. {}", x),
+                State::SmallBreak(x) => format!("Small Break Nr. {}", x),
+                State::LargeBreak => "Large Break".to_string(),
+                _ => unreachable!(),
+            }
+        )
     }
 }
