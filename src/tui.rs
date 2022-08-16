@@ -55,18 +55,19 @@ impl Tui<'_> {
             let size = terminal_size().unwrap();
             self.pomodoro.tick();
 
-            let output_string = format!(
-                "{} - Time left: {}s",
-                self.pomodoro.state(),
-                self.pomodoro.seconds_remaining(),
-            );
+            let time_string = format!("Time left: {}s", self.pomodoro.seconds_remaining(),);
+            let state_string = self.pomodoro.state();
 
             write!(
                 self.stdout,
-                "{}{}{}",
+                "{}{}{}{}{}\n{}{}",
                 termion::clear::CurrentLine,
-                termion::cursor::Goto(size.0 / 2 - (output_string.len() / 2) as u16, size.1 / 2),
-                output_string,
+                termion::cursor::Goto(size.0 / 2 - (state_string.len() / 2) as u16, size.1 / 2 - 1),
+                termion::style::Bold,
+                state_string,
+                termion::style::Reset,
+                termion::cursor::Goto(size.0 / 2 - (time_string.len() / 2) as u16, size.1 / 2),
+                time_string,
             )
             .unwrap();
             self.stdout.flush().unwrap();
