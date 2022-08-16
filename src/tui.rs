@@ -43,9 +43,13 @@ impl Tui<'_> {
         loop {
             let b = self.stdin.next();
             match b {
-                Some(Ok(b'q')) => break,
+                Some(Ok(b'q')) => {
+                    self.cleanup();
+                    break;
+                }
                 Some(Ok(x)) => {
                     if let Ok(Event::Key(Key::Ctrl('c'))) = parse_event(x, &mut self.stdin) {
+                        self.cleanup();
                         break;
                     }
                 }
@@ -95,5 +99,10 @@ impl Tui<'_> {
             termion::clear::CurrentLine,
             time_string,
         )
+    }
+
+    fn cleanup(&mut self) {
+        write!(self.stdout, "{}", termion::cursor::Show).unwrap();
+        self.stdout.flush().unwrap();
     }
 }
