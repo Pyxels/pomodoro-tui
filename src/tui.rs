@@ -55,7 +55,11 @@ impl Tui<'_> {
             let size = terminal_size().unwrap();
             self.pomodoro.tick();
 
-            let time_string = format!("Time left: {}s", self.pomodoro.seconds_remaining(),);
+            let seconds_remaining = self.pomodoro.seconds_remaining();
+            let time_string = match seconds_remaining {
+                x if x < 60 => format!("Time left: {}s", x),
+                x => format!("Time left: {}m", x / 60),
+            };
             let state_string = self.pomodoro.state();
 
             write!(
