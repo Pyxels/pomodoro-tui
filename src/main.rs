@@ -16,5 +16,7 @@ fn main() {
         large_rest: large_rest_time,
     } = Args::parse();
 
-    Tui::new(work_time, small_rest_time, large_rest_time).clear().start_loop();
+    Tui::new(work_time, small_rest_time, large_rest_time)
+        .clear()
+        .start_loop();
 }
