@@ -75,7 +75,7 @@ impl Pomodoro {
         if let Some(notification) = notification {
             if self.send_notifications {
                 Command::new("notify-send")
-                    .arg("Pomodoro")
+                    .arg("Pomodoro 🍅")
                     .arg(notification)
                     .output()
                     .expect("Failed to send notification");
