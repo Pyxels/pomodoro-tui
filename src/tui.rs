@@ -55,23 +55,13 @@ impl Tui<'_> {
             let size = terminal_size().unwrap();
             self.pomodoro.tick();
 
-            let seconds_remaining = self.pomodoro.seconds_remaining();
-            let time_string = match seconds_remaining {
-                x if x < 60 => format!("Time left: {}s", x),
-                x => format!("Time left: {}m", x / 60),
-            };
-            let state_string = self.pomodoro.state();
+            let state_string = self.get_state_string(size);
+            let time_string = self.get_time_string(size);
 
             write!(
                 self.stdout,
-                "{}{}{}{}{}\n{}{}{}{}",
-                termion::cursor::Goto(size.0 / 2 - (state_string.len() / 2) as u16, size.1 / 2 - 1),
-                termion::clear::CurrentLine,
-                termion::style::Bold,
+                "{}{}{}",
                 state_string,
-                termion::style::Reset,
-                termion::cursor::Goto(size.0 / 2 - (time_string.len() / 2) as u16, size.1 / 2),
-                termion::clear::CurrentLine,
                 time_string,
                 termion::cursor::Hide,
             )
@@ -79,5 +69,31 @@ impl Tui<'_> {
             self.stdout.flush().unwrap();
             thread::sleep(Duration::from_secs(1));
         }
+    }
+
+    fn get_state_string(&self, size: (u16, u16)) -> String {
+        let state_string = self.pomodoro.state();
+        format!(
+            "{}{}{}{}{}",
+            termion::cursor::Goto(size.0 / 2 - (state_string.len() / 2) as u16, size.1 / 2 - 1),
+            termion::clear::CurrentLine,
+            termion::style::Bold,
+            state_string,
+            termion::style::Reset,
+        )
+    }
+
+    fn get_time_string(&self, size: (u16, u16)) -> String {
+        let seconds_remaining = self.pomodoro.seconds_remaining();
+        let time_string = match seconds_remaining {
+            x if x < 60 => format!("Time left: {}s", x),
+            x => format!("Time left: {}m", x / 60),
+        };
+        format!(
+            "\n{}{}{}",
+            termion::cursor::Goto(size.0 / 2 - (time_string.len() / 2) as u16, size.1 / 2),
+            termion::clear::CurrentLine,
+            time_string,
+        )
     }
 }
