@@ -4,7 +4,7 @@ const WORK_TIME: i64 = 25 * 60;
 const SMALL_REST_TIME: i64 = 5 * 60;
 const LARGE_REST_TIME: i64 = 35 * 60;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum State {
     Work(u8),
     SmallBreak(u8),
@@ -49,6 +49,29 @@ impl Pomodoro {
                 }
             }
             _ => (),
+        }
+    }
+
+    pub fn next(&mut self) {
+        if let State::Overtime(state) = &self.state {
+            match **state {
+                State::Work(4) => {
+                    self.state = State::LargeBreak;
+                }
+                State::Work(x) => {
+                    self.state = State::SmallBreak(x);
+                }
+                State::SmallBreak(x) => {
+                    self.state = State::Work(x+1);
+                }
+                State::LargeBreak => {
+                    self.state = State::Work(1);
+                }
+                State::Overtime(_) => {
+                    unreachable!()
+                }
+            }
+            self.start_time = SystemTime::now();
         }
     }
 
