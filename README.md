@@ -5,7 +5,12 @@ This program is a minimal Terminal-UI application that counts down the segments 
 Notifications using the notification daemon via `notify-send` can be enabled using the `-n` flag.
 
 ## Usage
-Just run the program with the desired options.
+```sh
+git clone https://github.com/Pyxels/pomodoro-tui
+cd pomodoro-tui
+cargo build --release
+./target/release/pomodoro-tui
+```
 For help, run `pomodoro-tui --help`.
 
 ### Options
