@@ -6,6 +6,7 @@ use termion::event::{parse_event, Event, Key};
 use termion::raw::{IntoRawMode, RawTerminal};
 use termion::{async_stdin, terminal_size, AsyncReader};
 
+use crate::cli::PomodoroArgs;
 use crate::pomodoro::{Pomodoro, State};
 
 pub struct Tui<'a> {
@@ -15,24 +16,12 @@ pub struct Tui<'a> {
 }
 
 impl Tui<'_> {
-    pub fn new(
-        work_time: i64,
-        small_rest_time: i64,
-        large_rest_time: i64,
-        send_notifications: bool,
-        allow_continue: bool,
-    ) -> Tui<'static> {
+    pub fn new(args: PomodoroArgs) -> Tui<'static> {
         let stdout = stdout();
         let stdout = stdout.lock().into_raw_mode().unwrap();
         let stdin = async_stdin().bytes();
 
-        let pomodoro = Pomodoro::new(
-            work_time,
-            small_rest_time,
-            large_rest_time,
-            send_notifications,
-            allow_continue,
-        );
+        let pomodoro = Pomodoro::new(args);
         Tui {
             stdout,
             stdin,

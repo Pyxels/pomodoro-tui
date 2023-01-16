@@ -1,5 +1,7 @@
 use std::{process::Command, time::SystemTime};
 
+use crate::cli::PomodoroArgs;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum State {
     Work(u8),
@@ -20,21 +22,15 @@ pub struct Pomodoro {
 }
 
 impl Pomodoro {
-    pub fn new(
-        work_minutes: i64,
-        small_rest_minutes: i64,
-        large_rest_minutes: i64,
-        send_notifications: bool,
-        allow_continue: bool,
-    ) -> Pomodoro {
+    pub fn new(args: PomodoroArgs) -> Pomodoro {
         Pomodoro {
-            work_time: work_minutes * 60,
-            small_rest_time: small_rest_minutes * 60,
-            large_rest_time: large_rest_minutes * 60,
+            work_time: args.work * 60,
+            small_rest_time: args.small_rest * 60,
+            large_rest_time: args.large_rest * 60,
             state: State::Work(1),
             start_time: SystemTime::now(),
-            send_notifications,
-            allow_continue,
+            send_notifications: args.notifications,
+            allow_continue: args.allow_continue,
         }
     }
 

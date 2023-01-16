@@ -6,19 +6,13 @@ extern crate termion;
 
 use clap::Parser;
 
-use crate::cli::Args;
+use crate::cli::PomodoroArgs;
 use crate::tui::Tui;
 
 fn main() {
-    let Args {
-        work,
-        small_rest,
-        large_rest,
-        notifications,
-        allow_continue,
-    } = Args::parse();
+    let args = PomodoroArgs::parse();
 
-    Tui::new(work, small_rest, large_rest, notifications, allow_continue)
+    Tui::new(args)
         .clear()
         .start_loop();
 }

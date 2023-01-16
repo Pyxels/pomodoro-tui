@@ -2,7 +2,7 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
-pub struct Args {
+pub struct PomodoroArgs {
     /// Duration of the work segment (minutes)
     #[clap(short, long, default_value_t = 25)]
     pub work: i64,
