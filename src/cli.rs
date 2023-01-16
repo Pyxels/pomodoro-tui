@@ -18,4 +18,8 @@ pub struct Args {
     /// Enable desktop notifications via the notification daemon
     #[clap(short, long)]
     pub notifications: bool,
+
+    /// Allow continuing even if the current time segment has not ended
+    #[clap(short = 'c', long)]
+    pub allow_continue: bool,
 }

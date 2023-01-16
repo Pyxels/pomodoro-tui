@@ -16,6 +16,7 @@ pub struct Pomodoro {
     state: State,
     start_time: SystemTime,
     send_notifications: bool,
+    allow_continue: bool,
 }
 
 impl Pomodoro {
@@ -24,6 +25,7 @@ impl Pomodoro {
         small_rest_minutes: i64,
         large_rest_minutes: i64,
         send_notifications: bool,
+        allow_continue: bool,
     ) -> Pomodoro {
         Pomodoro {
             work_time: work_minutes * 60,
@@ -32,6 +34,7 @@ impl Pomodoro {
             state: State::Work(1),
             start_time: SystemTime::now(),
             send_notifications,
+            allow_continue,
         }
     }
 
@@ -84,26 +87,30 @@ impl Pomodoro {
     }
 
     pub fn next(&mut self) {
-        if let State::Overtime(state) = &self.state {
-            match **state {
-                State::Work(4) => {
-                    self.state = State::LargeBreak;
-                }
-                State::Work(x) => {
-                    self.state = State::SmallBreak(x);
-                }
-                State::SmallBreak(x) => {
-                    self.state = State::Work(x + 1);
-                }
-                State::LargeBreak => {
-                    self.state = State::Work(1);
-                }
-                State::Overtime(_) => {
-                    unreachable!()
-                }
+        let state = match &self.state {
+            State::Overtime(state) => &state,
+            _ if self.allow_continue => &self.state,
+            _ => return,
+        };
+
+        match state {
+            State::Work(4) => {
+                self.state = State::LargeBreak;
             }
-            self.start_time = SystemTime::now();
+            State::Work(x) => {
+                self.state = State::SmallBreak(*x);
+            }
+            State::SmallBreak(x) => {
+                self.state = State::Work(x + 1);
+            }
+            State::LargeBreak => {
+                self.state = State::Work(1);
+            }
+            State::Overtime(_) => {
+                unreachable!()
+            }
         }
+        self.start_time = SystemTime::now();
     }
 
     fn seconds_passed(&self) -> i64 {

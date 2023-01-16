@@ -15,9 +15,10 @@ fn main() {
         small_rest,
         large_rest,
         notifications,
+        allow_continue,
     } = Args::parse();
 
-    Tui::new(work, small_rest, large_rest, notifications)
+    Tui::new(work, small_rest, large_rest, notifications, allow_continue)
         .clear()
         .start_loop();
 }

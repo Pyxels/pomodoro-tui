@@ -20,6 +20,7 @@ impl Tui<'_> {
         small_rest_time: i64,
         large_rest_time: i64,
         send_notifications: bool,
+        allow_continue: bool,
     ) -> Tui<'static> {
         let stdout = stdout();
         let stdout = stdout.lock().into_raw_mode().unwrap();
@@ -30,6 +31,7 @@ impl Tui<'_> {
             small_rest_time,
             large_rest_time,
             send_notifications,
+            allow_continue,
         );
         Tui {
             stdout,
