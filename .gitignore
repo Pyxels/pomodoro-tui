@@ -1,1 +1,5 @@
 /target
+
+# nix
+.pre-commit-config.yaml
+.direnv/

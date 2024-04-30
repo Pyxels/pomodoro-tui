@@ -12,7 +12,5 @@ use crate::tui::Tui;
 fn main() {
     let args = PomodoroArgs::parse();
 
-    Tui::new(args)
-        .clear()
-        .start_loop();
+    Tui::new(args).clear().start_loop();
 }

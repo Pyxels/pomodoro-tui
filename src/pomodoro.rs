@@ -84,7 +84,7 @@ impl Pomodoro {
 
     pub fn next(&mut self) {
         let state = match &self.state {
-            State::Overtime(state) => &state,
+            State::Overtime(state) => state,
             _ if self.allow_continue => &self.state,
             _ => return,
         };
